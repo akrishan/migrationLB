@@ -5,38 +5,38 @@ import os
 from win32api import GetFileVersionInfo, LOWORD, HIWORD  #Referred to VB API from MSDN to retrieve version attributes for dll and exe files 
 import csv
 
-def findDirDifference(sourceDir,targetDir, resultFile):
+def find_folders_difference(sourceDir,targetDir, resultFile):
     f =[]
     d= []
     f2 =[]
     d2 = []
-    #Walk through migration-from(source) directory get the file name in files array
+    #Walk through migration-from(source) directory by calling helper function and store in a list
     f,d = get_filenames_dirnames(sourceDir)
-    #Walk through migration-To (target) directory	    
+    #Walk through migration-To (target) directory    
     f2,d2 = get_filenames_dirnames(targetDir)
-    
-    f = set(f)
+    f = set(f)         #convert list to set so 
     d = set(d)    
     f2 = set(f2)
     d2 = set(d2)
     fdiff = f.difference(f2)
     fdiff2 = f2.difference(f)
-    wtf = open(resultFile, 'w')
+    writer = open(resultFile, 'w')
     if len(fdiff) > 0:
-        wtf.writelines("Exceptions Found:\n\n")
-        wtf.writelines("Note below files are in %s but are not in the %s:\n" % (sourceDir, targetDir))        
+        writer.writelines("Exceptions Found:\n\n")
+        writer.writelines("Note below files are in %s but are not in the %s:\n" % (sourceDir, targetDir))        
         for item in fdiff:
-            wtf.writelines('%s\n' % item)    
-        wtf.writelines("\n================================================================\n\n")
-    wtf.flush()
+            writer.writelines('%s\n' % item)    
+        writer.writelines("\n================================================================\n\n")
+    writer.flush()
     if len(fdiff2) > 0:
-        wtf.writelines("Exceptions Found:\n\n")
-        wtf.writelines("Note below files are in %s but are not in the %s:\n" % (targetDir,  sourceDir))   
+        writer.writelines("Exceptions Found:\n\n")
+        writer.writelines("Note below files are in %s but are not in the %s:\n" % (targetDir,  sourceDir))   
         for item in fdiff2:
-            wtf.writelines('%s\n' % item)
-        wtf.writelines("\n================================================================\n\n")        
-        wtf.close()
+            writer.writelines('%s\n' % item)
+        writer.writelines("\n================================================================\n\n")        
+        writer.close()
 
+#Helper function to retrieve filenames and folder names and save it in lists
 def get_filenames_dirnames(pathname):
     fname = []
     dname = []
@@ -47,12 +47,12 @@ def get_filenames_dirnames(pathname):
             dname.append(d)
     return fname,dname   
 
-def get_version_number(myPath, myPath2, outfile):    
-    wtf = open(outfile, 'w')
-    wtf.writelines("File 1 Name,File 1 Version,File 2 Name,File 2 Version\n")
+def do_version_comparison(myPath, myPath2, outfile):    
+    writer = open(outfile, 'w')
+    writer.writelines("Source Filename,Source File Version,Target Filename,Target File Version\n")
     for root, dirs, files in os.walk(myPath):
         for f in files:
-            if os.path.isfile(f):
+            if os.path.isfile(os.path.join(root,f)):
                 f = f.lower() # Convert .EXE to .exe so next line wo
                 if (f.count('.exe') or f.count('.dll')): # Check only exe or dll files
                     fullPathToFile  = os.path.join(root,f)
@@ -65,8 +65,8 @@ def get_version_number(myPath, myPath2, outfile):
                                 fullPathToFile2  = os.path.join(root2,f2)
                                 major2,minor2,subminor2,revision2= get_version_info(fullPathToFile2)
                                 if f == f2:
-                                    wtf.writelines("%s,%s.%s.%s.%s,%s,%s.%s.%s.%s\n" % (fullPathToFile,major,minor,subminor,revision,fullPathToFile2,major2,minor2,subminor2,revision2))
-    wtf.close()
+                                    writer.writelines("%s,%s.%s.%s.%s,%s,%s.%s.%s.%s\n" % (fullPathToFile,major,minor,subminor,revision,fullPathToFile2,major2,minor2,subminor2,revision2))
+    writer.close()
     
 #Helper function to get_version_number function
 def get_version_info(filename):
@@ -80,12 +80,12 @@ def get_version_info(filename):
  
 
 if __name__ == '__main__':
-    resultFile = r'c:\output\ResultFile.txt'
+    resultFile = r'c:\output\Difference.txt'
     versionFile = r'c:\output\VersionComparison.csv'
     sourceDir = raw_input("Please enter the full path of source dir:")
     targetDir = raw_input("Please enter the full path of source dir:")
-    findDirDifference(sourceDir,targetDir,resultFile)
-    get_version_number(sourceDir,targetDir,versionFile)
+    find_folders_difference(sourceDir,targetDir,resultFile)
+    do_version_comparison(sourceDir,targetDir,versionFile)
 
 
 
