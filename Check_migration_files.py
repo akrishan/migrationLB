@@ -1,30 +1,25 @@
-##Two directories comparison script with version listing into two output files - ResultFile.txt and VersionComparison.csv
-##
+##Two directories comparison script with version listing into two output files
+## version 0.1
+
 import os
 from win32api import GetFileVersionInfo, LOWORD, HIWORD  #Referred to VB API from MSDN to retrieve version attributes for dll and exe files 
 import csv
 
 def findDirDifference(sourceDir,targetDir, resultFile):
-    f=[]
+    f =[]
     d= []
     f2 =[]
     d2 = []
-    for roots,dirs,files in os.walk(sourceDir):
-        for file in files:
-            f.append(file)        
-        for dir in dirs:
-            d.append(dir)            
-    for roots2,dirs2,files2 in os.walk(targetDir):
-        for file2 in files2:
-            f2.append(file2)        
-        for dir2 in dirs2:
-            d2.append(dir2)
+    #Walk through migration-from(source) directory get the file name in files array
+    f,d = get_filenames_dirnames(sourceDir)
+    #Walk through migration-To (target) directory	    
+    f2,d2 = get_filenames_dirnames(targetDir)
+    
     f = set(f)
     d = set(d)    
     f2 = set(f2)
     d2 = set(d2)
     fdiff = f.difference(f2)
-    print d.difference(d2)
     fdiff2 = f2.difference(f)
     wtf = open(resultFile, 'w')
     if len(fdiff) > 0:
@@ -41,6 +36,16 @@ def findDirDifference(sourceDir,targetDir, resultFile):
             wtf.writelines('%s\n' % item)
         wtf.writelines("\n================================================================\n\n")        
         wtf.close()
+
+def get_filenames_dirnames(pathname):
+    fname = []
+    dname = []
+    for roots,dirs,files in os.walk(pathname):
+        for f in files:       ##iterate over all the files in the dir
+            fname.append(f)
+        for d in dirs:
+            dname.append(d)
+    return fname,dname   
 
 def get_version_number(myPath, myPath2, outfile):    
     wtf = open(outfile, 'w')
