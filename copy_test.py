@@ -26,13 +26,17 @@ def main():
 def match_and_rename_release(releasepath,releaseroot,sourcedir):
     releasepath[-1] = sourcedir #replace directory name from development in release folder
     newpath = releasepath[0] + os.sep + os.path.relpath(os.path.join(*releasepath))
-    if not os.path.isdir(newpath):
-        shutil.copytree(releaseroot,newpath)
-        shutil.rmtree(releaseroot)
-    elif os.path.isdir(newpath):
-        print ("Directory already exists,copying correct addin files in this %s directory from %s" % (newpath,releaseroot))
-        copytree(releaseroot,newpath)
-
+    try:
+        if not os.path.isdir(newpath):
+            shutil.copytree(releaseroot,newpath)
+            shutil.rmtree(releaseroot)
+        elif os.path.isdir(newpath):
+            print ("Directory already exists,copying correct addin files in this %s directory from %s" % (newpath,releaseroot))
+            copytree(releaseroot,newpath)
+    except shutil.Error, exc:
+        print exc.args[0]
+                    
+        
 #helper function
 def copytree(src, dst, symlinks=False, ignore=None):
     for item in os.listdir(src):
