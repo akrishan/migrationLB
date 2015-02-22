@@ -7,11 +7,12 @@ def do_version_comparison(myPath, myPath2, outfile):
     writer.writelines("Source Filename,Source File Version,Target Filename,Target File Version\n")
     for root, dirs, files in os.walk(myPath):
         for f in files:
-            print f
+            #print f
             if os.path.isfile(os.path.join(root,f)):
                 f = f.lower() # Convert .EXE to .exe so next line wo
                 if (f.count('.exe') or f.count('.dll')): # Check only exe or dll files
                     fullPathToFile  = os.path.join(root,f)
+                    print f 
                     major,minor,subminor,revision= get_version_info(fullPathToFile)
                     for root2, dirs2, files2 in os.walk(myPath2):
                         for f2 in files2:
@@ -23,18 +24,18 @@ def do_version_comparison(myPath, myPath2, outfile):
                                 if f == f2:
                                     writer.writelines("%s,%s.%s.%s.%s,%s,%s.%s.%s.%s\n" % (fullPathToFile,major,minor,subminor,revision,fullPathToFile2,major2,minor2,subminor2,revision2))
                                     print ("%s,%s.%s.%s.%s,%s,%s.%s.%s.%s\n" % (fullPathToFile,major,minor,subminor,revision,fullPathToFile2,major2,minor2,subminor2,revision2))    
-                                    sourceversion = [major,minor,subminor,revision]
-                                    targetversion = [major2,minor2,subminor2,revision2]
+                                    sourceversion = map(int, [major,minor,subminor,revision])
+                                    targetversion = map(int,[major2,minor2,subminor2,revision2])
                                     print ("This is a sourceversion %s " % sourceversion)
-                                    print ("This is a targetversion %s " % targetversion)
-                                    if major > major2:
+                                    print ("This is a targetversion %s " % targetversion)                                    
+                                    if (major > major2):
                                         print "patch-source major version is greater than current target version, apply patch to target"
-                                    elif major == major2 and minor > minor2:
+                                    elif (major == major2 and minor > minor2):
                                         print "patch-source minor version is greater than current target version, apply patch to target"
-                                    elif major == major2 and minor == minor2 and subminor > subminor2:
+                                    elif (major == major2 and minor == minor2 and subminor > subminor2):
                                         print "patch-source subminor version is greater than current target version, apply patch to target"
-                                    elif revision > revision2:
-                                        print "patch-source major version is greater than current target version, apply patch to target"
+                                    elif (major == major2 and minor == minor2 and subminor == subminor2 and revision > revision2):
+                                        print "patch-source revision version is greater than current target version, apply patch to target"
                                     else:
                                         "There is no latest patch release available %s for this file" % f
     writer.close()

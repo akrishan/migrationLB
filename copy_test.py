@@ -2,6 +2,16 @@ import os
 import fnmatch
 import shutil
 
+      
+def main():    
+    outlook_pattern = 'outlook*'
+    excel_pattern = 'excel*'
+    release_full_path = r'c:\release'
+    dev_full_path = r'c:\LiberateDev'
+    releasepath,releaseroot,releasefoldername = get_paths_based_on_pattern(release_full_path,outlook_pattern)
+    devpath, devroot,devdir = get_paths_based_on_pattern(dev_full_path,outlook_pattern)
+    match_and_rename_release(releasepath,releaseroot,devdir)
+
 def get_paths_based_on_pattern(abspathname,pattern):
     for root,dirs,files in os.walk(abspathname,topdown=False):
             for f in files:
@@ -13,15 +23,6 @@ def get_paths_based_on_pattern(abspathname,pattern):
                         foldername = splitpath[-1]
                         break
     return splitpath, rootpath, foldername
-       
-def main():    
-    outlook_pattern = 'outlook*'
-    excel_pattern = 'excel*'
-    release_full_path = r'c:\release'
-    dev_full_path = r'c:\LiberateDev'
-    releasepath,releaseroot,releasefoldername = get_paths_based_on_pattern(release_full_path,outlook_pattern)
-    devpath, devroot,devdir = get_paths_based_on_pattern(dev_full_path,outlook_pattern)
-    match_and_rename_release(releasepath,releaseroot,devdir)
         
 def match_and_rename_release(releasepath,releaseroot,sourcedir):
     releasepath[-1] = sourcedir #replace directory name from development in release folder
