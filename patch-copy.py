@@ -1,6 +1,7 @@
 
 import os
-from win32api import GetFileVersionInfo, LOWORD, HIWORD 
+from win32api import GetFileVersionInfo, LOWORD, HIWORD
+import shutil
 
 def do_version_comparison(myPath, myPath2, outfile):    
     writer = open(outfile, 'w')
@@ -30,17 +31,22 @@ def do_version_comparison(myPath, myPath2, outfile):
                                     print ("This is a targetversion %s " % targetversion)                                    
                                     if (major > major2):
                                         print "patch-source major version is greater than current target version, apply patch to target"
+                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
                                     elif (major == major2 and minor > minor2):
                                         print "patch-source minor version is greater than current target version, apply patch to target"
+                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
                                     elif (major == major2 and minor == minor2 and subminor > subminor2):
                                         print "patch-source subminor version is greater than current target version, apply patch to target"
+                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
                                     elif (major == major2 and minor == minor2 and subminor == subminor2 and revision > revision2):
                                         print "patch-source revision version is greater than current target version, apply patch to target"
-                                    else:
-                                        "There is no latest patch release available %s for this file" % f
+                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
+                                else:
+                                    print "There is no latest patch release available for %s this file" % f
     writer.close()
     
-#Helper function to get_version_number function
+
+#Helper function
 def get_version_info(filename):
     try:
     	info = GetFileVersionInfo(filename, "\\")
