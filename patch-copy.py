@@ -2,6 +2,7 @@
 import os
 from win32api import GetFileVersionInfo, LOWORD, HIWORD
 import shutil
+import sys
 
 def do_version_comparison(myPath, myPath2, outfile):    
     writer = open(outfile, 'w')
@@ -31,19 +32,27 @@ def do_version_comparison(myPath, myPath2, outfile):
                                     print ("This is a targetversion %s " % targetversion)                                    
                                     if (major > major2):
                                         print "patch-source major version is greater than current target version, apply patch to target"
-                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
+                                        copy_patch_version()
                                     elif (major == major2 and minor > minor2):
                                         print "patch-source minor version is greater than current target version, apply patch to target"
-                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
-                                    elif (major == major2 and minor == minor2 and subminor > subminor2):
+                                        copy_patch_version()
+                                    elif (major == major2 and minor == minor2 and subminor > subminor2):                                        
                                         print "patch-source subminor version is greater than current target version, apply patch to target"
-                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
+                                        copy_patch_version()
                                     elif (major == major2 and minor == minor2 and subminor == subminor2 and revision > revision2):
                                         print "patch-source revision version is greater than current target version, apply patch to target"
-                                        shutil.copy2(fullPathToFile,fullPathToFile2) 
+                                        copy_patch_version()
                                 else:
                                     print "There is no latest patch release available for %s this file" % f
     writer.close()
+
+def copy_patch_version():
+    userprompt = "Would you like to copy %s to %s " % fullPathToFile, fullPathToFile2
+    if userprompt == "Y" or userprompt == "y":
+        shutil.copy2(fullPathToFile,fullPathToFile2)
+    else:
+        print "You have selected to exit the program"
+        sys.exit() 
     
 
 #Helper function
