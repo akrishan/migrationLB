@@ -68,10 +68,10 @@ def find_app_version_in_release(dcmp):
             #print ('"%s" file in "%s"\n\n' % (name, dcmp.left))
             #print sourcePath
             print_version(sourcePath,name)
-            #if sourcePath.lower().endswith('.exe'):
+            if sourcePath.lower().endswith('.exe'):
                 #print "TRUE"
-                #major,minor,subminor,revision = get_version_info(sourcePath)
-                #print ("%s - %s.%s.%s.%s" % (name, major,minor,subminor,revision))          
+                major,minor,subminor,revision = get_version_info(sourcePath)
+                print ("%s - %s.%s.%s.%s" % (name, major,minor,subminor,revision))          
     for sub_dir in dcmp.subdirs.values():
         find_app_version_in_release(sub_dir)       
         
