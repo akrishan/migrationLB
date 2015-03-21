@@ -68,7 +68,7 @@ def get_version_info(filename):
 
 if __name__ == '__main__':
     versionFile = r'c:\output\VersionComparison-test.csv'
-    sourceDir = r'c:\patch-store'
+    sourceDir = r'c:\release'
     targetDir = r'c:\LiberateDev'
     #print (sourceDir,targetDir,resultFile)
     do_version_comparison(sourceDir,targetDir,versionFile)
