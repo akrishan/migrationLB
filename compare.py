@@ -7,12 +7,15 @@ from win32api import GetFileVersionInfo, LOWORD, HIWORD  #Referred to VB API fro
 from filecmp import dircmp
 import os
 import fnmatch
+from openpyxl import Workbook
 
 
 
 sourceDir = r'c:\release'
 targetDir = r'c:\LiberateDev\AutoUpdates'
-targetDir2 = r'c:\LiberateDev'    
+targetDir2 = r'c:\LiberateDev'
+dst_workbook = r'c:\test\output\out.xlsx'
+
 
 def main():
     #resultFile = r'c:\output\Difference.txt'
@@ -22,9 +25,9 @@ def main():
     #do_version_comparison(sourceDir,targetDir,versionFile)
     dcmp = dircmp(sourceDir, targetDir)
     #files_not_in_target(dcmp)
-    #full_report(dcmp)
+    full_report(dcmp)
     #find_app_version_in_release(dcmp)
-    find_version_in_release_vs_LiberateSE(dircmp(sourceDir,targetDir2))
+    #find_version_in_release_vs_LiberateSE(dircmp(sourceDir,targetDir2))
 
 #Find files which exists in new release but are not in Liberate destination folder 
 def files_not_in_target(dcmp):
@@ -87,7 +90,11 @@ def find_version_in_release_vs_LiberateSE(dcmp):
 
  #Find files present in both and get their versions     
 def find_app_version_in_release(dcmp):
-    for name in dcmp.common:
+    wb = Workbook()
+    ws1 = wb.active
+    ws1.title = "Versions in both"
+    ws1.append(("Filename","New Release Version","Liberate Version"))
+    for name in dcmp.funny_files:
         sourcePath = os.path.join(dcmp.left,name)
         #foldername = dcmp.left.split("\\")[-1]
         #print foldername
@@ -96,32 +103,45 @@ def find_app_version_in_release(dcmp):
             folder_list = ['Liberate SE', 'Liberate']
             if name in folder_list:
                 continue #skip folders in folder_list               print name               
-                
+                #find_version_in_release_vs_LiberateSE(dircmp(sourceDir,targetDir2))
                 #continue    
-            print name     
+            else:
+                
+                print name     
         else:
             #pass
             #print
             #print ('"%s" file in "%s"\n\n' % (name, dcmp.left))
             #print sourcePath
-            print_version(sourcePath,name)
-            if sourcePath.lower().endswith('.exe'):
+            #export_list = []
+            targetPath = os.path.join(dcmp.right,name)
+            srcfileversion = print_version(sourcePath,name)
+            dstfileversion = print_version(targetPath,name)
+            export_list = [name,srcfileversion,dstfileversion]
+            
+            #export_list.append(srcfileversion)
+            #export_list.append(dstfileversion[-1])
+            ws1.append(export_list)
+            #if sourcePath.lower().endswith('.exe'):
                 #print "TRUE"
-                major,minor,subminor,revision = get_version_info(sourcePath)
-                print ("%s - %s.%s.%s.%s" % (name, major,minor,subminor,revision))          
+                #major,minor,subminor,revision = get_version_info(sourcePath)
+                #print ("%s - %s.%s.%s.%s" % (name, major,minor,subminor,revision))          
     for sub_dir in dcmp.subdirs.values():
-        find_app_version_in_release(sub_dir)       
+        find_app_version_in_release(sub_dir)
+    wb.save(filename = dst_workbook)
     return    
         
 def print_version(sourcePath, fname):
     if sourcePath.lower().endswith('.exe'):
                 #print "TRUE"
         major,minor,subminor,revision = get_version_info(sourcePath)
-        print ("%s - %s.%s.%s.%s" % (fname, major,minor,subminor,revision))    
-    return
+        ver = ("%s.%s.%s.%s" % (major,minor,subminor,revision))
+        return ver
+    return 
 
 def full_report(dcmp):
-    print dcmp.report_full_closure()
+    with open(r'C:\test\output\out.txt','w') as f:
+        f.write(dcmp.report_full_closure())
     
 def get_version_info(filename):
     try:
